@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Games</title>
+<meta name="theme-color" content="#0f1020">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+<style>
+  :root {
+    --bg: #0f1020;
+    --text: #f4f4fb;
+    --muted: #9a9bb8;
+    --card: rgba(255,255,255,.06);
+    --border: rgba(255,255,255,.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(900px 500px at 10% -10%, rgba(106,170,100,.28), transparent 60%),
+      radial-gradient(800px 500px at 100% 10%, rgba(201,180,88,.22), transparent 60%),
+      radial-gradient(900px 600px at 50% 120%, rgba(120,90,255,.28), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 56px 20px 40px;
+  }
+  header { text-align: center; margin-bottom: 40px; }
+  .date { color: var(--muted); font-size: .95rem; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { font-size: clamp(2rem, 6vw, 3.2rem); margin: 8px 0 10px; letter-spacing: -.02em; }
+  h1 span { background: linear-gradient(90deg,#6aaa64,#c9b458,#a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .progress { color: var(--muted); font-size: 1rem; }
+  .progress b { color: var(--text); }
+  .grid {
+    width: 100%; max-width: 1000px;
+    display: grid; gap: 22px;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  }
+  .card {
+    position: relative; overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 28px 24px 24px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex; flex-direction: column; gap: 18px;
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .card:hover { transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 18px 50px -18px var(--accent); }
+  .tiles { display: flex; gap: 6px; }
+  .tile {
+    width: 38px; height: 38px; border-radius: 8px;
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 1.1rem; color: #fff;
+    background: rgba(255,255,255,.1);
+  }
+  .tile.hit { background: var(--accent); }
+  .tile.near { background: var(--accent2); }
+  h2 { font-size: 1.5rem; letter-spacing: -.01em; }
+  .desc { color: var(--muted); font-size: .95rem; line-height: 1.45; flex: 1; }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 15px 20px; border-radius: 16px;
+    font-size: 1.05rem; font-weight: 700; color: #fff; text-decoration: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 10px 24px -10px var(--accent);
+    transition: transform .15s ease, filter .15s ease;
+  }
+  .btn:hover { filter: brightness(1.12); transform: scale(1.02); }
+  .btn:active { transform: scale(.98); }
+  .done-toggle {
+    background: none; border: 0; color: var(--muted); cursor: pointer;
+    font: inherit; font-size: .9rem; display: flex; align-items: center; gap: 8px;
+    align-self: center; padding: 4px 8px; border-radius: 8px;
+  }
+  .done-toggle:hover { color: var(--text); }
+  .check {
+    width: 18px; height: 18px; border-radius: 6px; border: 2px solid var(--muted);
+    display: grid; place-items: center; font-size: .75rem; color: transparent;
+  }
+  .card.done { opacity: .72; }
+  .card.done .check { background: #6aaa64; border-color: #6aaa64; color: #fff; }
+  .card.done h2 { text-decoration: line-through; text-decoration-color: rgba(255,255,255,.35); }
+  footer { margin-top: 44px; color: var(--muted); font-size: .85rem; }
+  .all-done { display: none; margin-top: 8px; font-size: 1.05rem; }
+  body.complete .all-done { display: block; }
+  body.complete .progress { display: none; }
+  #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+  @keyframes pop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
+  body.celebrate .all-done { animation: pop .7s cubic-bezier(.2,.9,.3,1.3); }
+  @keyframes glow { 0%,100% { box-shadow: 0 0 0 0 transparent; } 50% { box-shadow: 0 0 40px -4px var(--accent); } }
+  body.celebrate .card { animation: glow 1.2s ease 2; }
+  @media (prefers-reduced-motion: reduce) { #confetti { display: none; } body.celebrate .all-done, body.celebrate .card { animation: none; } }
+</style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <header>
+    <div class="date" id="date"></div>
+    <h1>Daily <span>Games</span></h1>
+    <div class="progress" id="progress"></div>
+    <div class="all-done">🎉 All done for today. See you tomorrow!</div>
+  </header>
+
+  <main class="grid">
+    <article class="card" data-id="wordle-en" style="--accent:#6aaa64; --accent2:#4b8a47">
+      <div class="tiles">
+        <div class="tile hit">W</div><div class="tile near">O</div><div class="tile">R</div><div class="tile hit">D</div><div class="tile">L</div>
+      </div>
+      <div>
+        <h2>Wordle</h2>
+      </div>
+      <p class="desc">The classic five-letter daily puzzle from The New York Times.</p>
+      <a class="btn" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener noreferrer">Play now <span>→</span></a>
+      <button class="done-toggle" type="button"><span class="check">✓</span><span class="label">Mark as done</span></button>
+    </article>
+
+    <article class="card" data-id="wordle-de" style="--accent:#e0b73a; --accent2:#d9822b">
+      <div class="tiles">
+        <div class="tile near">W</div><div class="tile hit">O</div><div class="tile">R</div><div class="tile near">T</div><div class="tile hit">E</div>
+      </div>
+      <div>
+        <h2>Wordle auf Deutsch</h2>
+      </div>
+      <p class="desc">Das tägliche Wörterraten von SPIEGEL, auf Deutsch.</p>
+      <a class="btn" href="https://www.spiegel.de/games/wordle-auf-deutsch-kostenlos-online-spielen-a-cbfa309d-a8ad-4d7d-9234-28b09b945834" target="_blank" rel="noopener noreferrer">Jetzt spielen <span>→</span></a>
+      <button class="done-toggle" type="button"><span class="check">✓</span><span class="label">Mark as done</span></button>
+    </article>
+
+    <article class="card" data-id="krillion" style="--accent:#8b5cf6; --accent2:#3b82f6">
+      <div class="tiles">
+        <div class="tile hit">K</div><div class="tile hit">R</div><div class="tile near">I</div><div class="tile">L</div><div class="tile">…</div>
+      </div>
+      <div>
+        <h2>Krillion</h2>
+      </div>
+      <p class="desc">Your daily dive over at krillion.io.</p>
+      <a class="btn" href="https://krillion.io/" target="_blank" rel="noopener noreferrer">Play now <span>→</span></a>
+      <button class="done-toggle" type="button"><span class="check">✓</span><span class="label">Mark as done</span></button>
+    </article>
+  </main>
+
+  <footer>Checkmarks reset automatically every day.</footer>
+
+<script>
+  const today = new Date();
+  const key = "dailygames-" + today.toLocaleDateString("sv-SE"); // YYYY-MM-DD, local time
+  document.getElementById("date").textContent =
+    today.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+
+  let state = {};
+  try {
+    state = JSON.parse(localStorage.getItem(key) || "{}");
+    // clean up old days
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith("dailygames-") && k !== key) localStorage.removeItem(k);
+    });
+  } catch (e) {}
+
+  const cards = [...document.querySelectorAll(".card")];
+
+  function render() {
+    let n = 0;
+    cards.forEach(c => {
+      const done = !!state[c.dataset.id];
+      c.classList.toggle("done", done);
+      c.querySelector(".label").textContent = done ? "Done today" : "Mark as done";
+      if (done) n++;
+    });
+    document.getElementById("progress").innerHTML = "<b>" + n + "</b> of " + cards.length + " done today";
+    document.body.classList.toggle("complete", n === cards.length);
+    return n === cards.length;
+  }
+
+  function setDone(id, val) {
+    const wasComplete = cards.every(c => state[c.dataset.id]);
+    state[id] = val;
+    try { localStorage.setItem(key, JSON.stringify(state)); } catch (e) {}
+    const nowComplete = render();
+    if (nowComplete && !wasComplete) celebrate();
+  }
+
+  // ---- celebration: confetti bursts ----
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+  let parts = [], raf = null;
+  const colors = ["#6aaa64", "#c9b458", "#a78bfa", "#3b82f6", "#f472b6", "#fb923c", "#ffffff"];
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  addEventListener("resize", resize); resize();
+
+  function burst(x, y, count) {
+    for (let i = 0; i < count; i++) {
+      const a = Math.random() * Math.PI * 2, s = 5 + Math.random() * 9;
+      parts.push({
+        x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 6,
+        w: 6 + Math.random() * 7, h: 4 + Math.random() * 5,
+        r: Math.random() * 6, vr: (Math.random() - .5) * .4,
+        c: colors[(Math.random() * colors.length) | 0], life: 0
+      });
+    }
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    parts.forEach(p => {
+      p.vy += .22; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+      ctx.save();
+      ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.globalAlpha = Math.max(0, 1 - p.life / 170);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    parts = parts.filter(p => p.life < 170 && p.y < innerHeight + 40);
+    if (parts.length) raf = requestAnimationFrame(tick);
+    else { raf = null; ctx.clearRect(0, 0, innerWidth, innerHeight); }
+  }
+
+  function celebrate() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    document.body.classList.add("celebrate");
+    setTimeout(() => document.body.classList.remove("celebrate"), 2600);
+    const w = innerWidth, h = innerHeight;
+    burst(w * .5, h * .35, 120);
+    setTimeout(() => burst(w * .2, h * .45, 80), 250);
+    setTimeout(() => burst(w * .8, h * .45, 80), 450);
+    setTimeout(() => burst(w * .5, h * .25, 100), 800);
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+
+  cards.forEach(c => {
+    c.querySelector(".done-toggle").addEventListener("click", () => setDone(c.dataset.id, !state[c.dataset.id]));
+    // launching a game marks it done automatically
+    c.querySelector(".btn").addEventListener("click", () => setDone(c.dataset.id, true));
+  });
+
+  render();
+</script>
+</body>
+</html>
