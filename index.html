@@ -70,6 +70,7 @@
     box-shadow: 0 10px 24px -10px var(--accent);
     transition: transform .15s ease, filter .15s ease;
   }
+  .btn img { width: 24px; height: 24px; padding: 3px; border-radius: 7px; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
   .btn:hover { filter: brightness(1.12); transform: scale(1.02); }
   .btn:active { transform: scale(.98); }
   .done-toggle {
@@ -115,7 +116,7 @@
         <h2>Wordle</h2>
       </div>
       <p class="desc">The classic five-letter daily puzzle from The New York Times.</p>
-      <a class="btn" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener noreferrer">Play now <span>→</span></a>
+      <a class="btn" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=nytimes.com&sz=64" alt="" onerror="this.remove()">Play now <span>→</span></a>
       <button class="done-toggle" type="button"><span class="check">✓</span><span class="label">Mark as done</span></button>
     </article>
 
@@ -127,7 +128,7 @@
         <h2>Wordle auf Deutsch</h2>
       </div>
       <p class="desc">Das tägliche Wörterraten von SPIEGEL, auf Deutsch.</p>
-      <a class="btn" href="https://www.spiegel.de/games/wordle-auf-deutsch-kostenlos-online-spielen-a-cbfa309d-a8ad-4d7d-9234-28b09b945834" target="_blank" rel="noopener noreferrer">Jetzt spielen <span>→</span></a>
+      <a class="btn" href="https://www.spiegel.de/games/wordle-auf-deutsch-kostenlos-online-spielen-a-cbfa309d-a8ad-4d7d-9234-28b09b945834" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=spiegel.de&sz=64" alt="" onerror="this.remove()">Jetzt spielen <span>→</span></a>
       <button class="done-toggle" type="button"><span class="check">✓</span><span class="label">Mark as done</span></button>
     </article>
 
@@ -139,7 +140,30 @@
         <h2>Krillion</h2>
       </div>
       <p class="desc">Your daily dive over at krillion.io.</p>
-      <a class="btn" href="https://krillion.io/" target="_blank" rel="noopener noreferrer">Play now <span>→</span></a>
+      <a class="btn" href="https://krillion.io/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=krillion.io&sz=64" alt="" onerror="this.remove()">Play now <span>→</span></a>
+      <button class="done-toggle" type="button"><span class="check">✓</span><span class="label">Mark as done</span></button>
+    </article>
+    <article class="card" data-id="size-it-up" style="--accent:#f472b6; --accent2:#ef4444">
+      <div class="tiles">
+        <div class="tile hit">S</div><div class="tile near">I</div><div class="tile">Z</div><div class="tile hit">E</div><div class="tile">!</div>
+      </div>
+      <div>
+        <h2>Size It Up</h2>
+      </div>
+      <p class="desc">Today's daily challenge from Magnitudle.</p>
+      <a class="btn" href="https://magnitudle.com/size-it-up" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=magnitudle.com&sz=64" alt="" onerror="this.remove()">Play now <span>→</span></a>
+      <button class="done-toggle" type="button"><span class="check">✓</span><span class="label">Mark as done</span></button>
+    </article>
+
+    <article class="card" data-id="fermi" style="--accent:#14b8a6; --accent2:#0ea5e9">
+      <div class="tiles">
+        <div class="tile hit">F</div><div class="tile near">E</div><div class="tile hit">R</div><div class="tile">M</div><div class="tile near">I</div>
+      </div>
+      <div>
+        <h2>Fermi</h2>
+      </div>
+      <p class="desc">Daily estimation puzzle over at fermi.gg.</p>
+      <a class="btn" href="https://fermi.gg/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=fermi.gg&sz=64" alt="" onerror="this.remove()">Play now <span>→</span></a>
       <button class="done-toggle" type="button"><span class="check">✓</span><span class="label">Mark as done</span></button>
     </article>
   </main>
